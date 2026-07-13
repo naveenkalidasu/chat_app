@@ -234,7 +234,7 @@ Return as JSON array of strings.`
     }
 }
 
-// Train AI from chat history - FIXED VERSION WITHOUT BROKEN REGEX
+// Train AI from chat history
 async function trainFromHistory() {
     try {
         const recentMessages = await Message.find({ 
@@ -242,10 +242,6 @@ async function trainFromHistory() {
         }).sort({ timestamp: -1 }).limit(50);
         
         for (const msg of recentMessages) {
-<<<<<<< HEAD
-            // Extract original and corrected versions - using simple string methods
-=======
->>>>>>> 5b440f8ebfe27589e418bce761afc92a96f6bfa6
             let original = '';
             let corrected = '';
             
