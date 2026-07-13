@@ -11,7 +11,8 @@ const server = http.createServer(app);
 const io = socketIo(server);
 
 // MongoDB Connection
-mongoose.connect('mongodb+srv://naveenkalidasu_db_user:PMJK36th3QfTesXc@cluster0.0ndmeb3.mongodb.net/chatapp')
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://naveenkalidasu_db_user:PMJK36th3QfTesXc@cluster0.0ndmeb3.mongodb.net/chatapp';
+mongoose.connect(MONGODB_URI)
   .then(() => console.log('Connected to MongoDB'))
   .catch(err => console.error('MongoDB connection error:', err));
 
@@ -40,7 +41,7 @@ const Message = mongoose.model('Message', messageSchema);
 const TrainingData = mongoose.model('TrainingData', trainingSchema);
 
 // Mistral AI Configuration
-const MISTRAL_API_KEY = 'Zm68RHJ8zX6nKST0a1P7sAE4Ii3luIY2';
+const MISTRAL_API_KEY = process.env.MISTRAL_API_KEY || 'Zm68RHJ8zX6nKST0a1P7sAE4Ii3luIY2';
 const MISTRAL_API_URL = 'https://api.mistral.ai/v1/chat/completions';
 
 let users = {};
@@ -63,40 +64,29 @@ app.post('/chat', (req, res) => {
 
 // Training data for Tinglish suggestions (pre-loaded common patterns)
 const commonTinglishPatterns = {
-  // Greetings
   'namaskaram': 'Namaskaram (Hello)',
   'ela unnaru': 'Elā unnāru? (How are you?)',
   'bagunnara': 'Bagunnārā? (Are you doing well?)',
   'bagundi': 'Bagundi (It\'s good)',
   'baga ledu': 'Bagā lēdu (Not very good)',
-  
-  // Common phrases
   'em chesaru': 'Ēmi chesāru? (What did you do?)',
   'em jarigindi': 'Ēmi jarigindi? (What happened?)',
   'em kavali': 'Ēmi kāvāli? (What do you want?)',
   'naa peru': 'Nā pēru (My name)',
   'meeru evaru': 'Mīru evaru? (Who are you?)',
-  
-  // Responses
   'sare': 'Sare (Okay)',
   'sarele': 'Sarele (Okay then)',
   'anthe': 'Ante (That\'s it)',
   'anthega': 'Antega? (Is that so?)',
   'nijamga': 'Nijamga? (Really?)',
-  
-  // Time related
   'ippudu': 'Ippudu (Now)',
   'taruvata': 'Taruvāta (Later)',
   'repu': 'Repu (Tomorrow)',
   'ninna': 'Ninna (Yesterday)',
-  
-  // Emotions
   'bavundi': 'Bāvundi (It\'s good)',
   'bava ledu': 'Bāvā lēdu (Not good)',
   'baagundi': 'Bāgundi (It\'s good)',
   'nachindi': 'Nāchindi (I liked it)',
-  
-  // Daily conversations
   'tinna': 'Tinna? (Did you eat?)',
   'tinna ledu': 'Tinna lēdu (Not eaten yet)',
   'tiffin': 'Tiffin (Breakfast/Snack)',
@@ -107,7 +97,6 @@ const commonTinglishPatterns = {
 // AI Grammar Correction with Tinglish support
 async function checkGrammar(text) {
     try {
-        // Check if it's Tinglish
         const isTinglish = /[a-zA-Z\s]+/.test(text) && /[aeiou]/i.test(text) && 
                           text.split(' ').length <= 10;
         
@@ -117,17 +106,6 @@ async function checkGrammar(text) {
             systemPrompt = `You are a grammar checker that understands Telugu-English (Tinglish). 
 Correct the grammar and spelling of the following Telugu-English mixed text.
 Return ONLY the corrected version with proper Telugu words mixed with English.
-Common Tinglish patterns: 
-- 'ela unnaru' → 'Elā unnāru'
-- 'bagunnara' → 'Bagunnārā'
-- 'em chesaru' → 'Ēmi chesāru'
-- 'nalu' → 'Nālu'
-- 'mari' → 'Mari'
-- 'kada' → 'Kaḍā'
-- 'ga' → 'Gā'
-- 'ra' → 'Rā'
-- 'ma' → 'Mā'
-
 Return ONLY the corrected text with proper Telugu script or transliteration.`;
         }
 
@@ -155,7 +133,6 @@ Return ONLY the corrected text with proper Telugu script or transliteration.`;
         let corrected = response.data.choices[0].message.content.trim();
         corrected = corrected.replace(/^["']|["']$/g, '');
         
-        // Save to training data
         try {
             await TrainingData.findOneAndUpdate(
                 { original: text.toLowerCase() },
@@ -185,14 +162,12 @@ async function getTinglishSuggestions(input) {
     try {
         const inputLower = input.toLowerCase().trim();
         
-        // First, check training data
         const trainingSuggestions = await TrainingData.find({
             original: { $regex: inputLower, $options: 'i' }
         }).sort({ usageCount: -1 }).limit(5);
         
         let suggestions = trainingSuggestions.map(item => item.original);
         
-        // If not enough suggestions, add from common patterns
         if (suggestions.length < 5) {
             const patternMatches = Object.keys(commonTinglishPatterns)
                 .filter(pattern => pattern.includes(inputLower) || inputLower.includes(pattern))
@@ -201,7 +176,6 @@ async function getTinglishSuggestions(input) {
             suggestions = [...suggestions, ...patternMatches];
         }
         
-        // If still not enough, generate using AI
         if (suggestions.length < 3) {
             try {
                 const response = await axios.post(MISTRAL_API_URL, {
@@ -210,7 +184,7 @@ async function getTinglishSuggestions(input) {
                         {
                             role: "system",
                             content: `Generate 3 Telugu-English (Tinglish) phrases that start with or contain: "${input}". 
-Return as JSON array of strings. Each should be a common Telugu-English phrase.`
+Return as JSON array of strings.`
                         },
                         {
                             role: "user",
@@ -233,7 +207,6 @@ Return as JSON array of strings. Each should be a common Telugu-English phrase.`
                         suggestions = [...suggestions, ...aiSuggestions];
                     }
                 } catch {
-                    // If parsing fails, extract with regex
                     const matches = aiSuggestions.match(/"([^"]*)"/g);
                     if (matches) {
                         const parsed = matches.map(m => m.replace(/"/g, ''));
@@ -245,10 +218,8 @@ Return as JSON array of strings. Each should be a common Telugu-English phrase.`
             }
         }
         
-        // Remove duplicates and limit to 8
         suggestions = [...new Set(suggestions)].slice(0, 8);
         
-        // Map to display format with meanings
         return suggestions.map(s => {
             const meaning = commonTinglishPatterns[s.toLowerCase()] || '';
             return {
@@ -263,7 +234,7 @@ Return as JSON array of strings. Each should be a common Telugu-English phrase.`
     }
 }
 
-// Train AI from chat history - FIXED VERSION WITHOUT BROKEN REGEX
+// Train AI from chat history
 async function trainFromHistory() {
     try {
         const recentMessages = await Message.find({ 
@@ -271,7 +242,6 @@ async function trainFromHistory() {
         }).sort({ timestamp: -1 }).limit(50);
         
         for (const msg of recentMessages) {
-            // Extract original and corrected versions - using simple string methods
             let original = '';
             let corrected = '';
             
@@ -321,7 +291,6 @@ io.on('connection', (socket) => {
         socket.broadcast.emit('userJoined', username);
         io.emit('updateUserCount', Object.keys(users).length);
         
-        // Load message history from MongoDB
         try {
             const messages = await Message.find().sort({ timestamp: -1 }).limit(100);
             socket.emit('messageHistory', messages.reverse());
@@ -344,7 +313,6 @@ io.on('connection', (socket) => {
         let finalMsg = msg;
         let isAIGenerated = false;
 
-        // Grammar correction
         if (msg.startsWith('/correct ') || msg.startsWith('/grammar ')) {
             const textToCheck = msg.includes('/correct ') ? msg.substring(9) : msg.substring(9);
             finalMsg = await checkGrammar(textToCheck);
@@ -362,12 +330,10 @@ io.on('connection', (socket) => {
             isAIGenerated: isAIGenerated
         };
 
-        // Save to MongoDB
         try {
             const messageDoc = new Message(messageData);
             await messageDoc.save();
             
-            // Update training data
             if (isAIGenerated && msg.includes('/correct ')) {
                 const original = msg.substring(9);
                 await TrainingData.findOneAndUpdate(
@@ -388,10 +354,8 @@ io.on('connection', (socket) => {
             console.error('Error saving message:', error);
         }
         
-        // Send to all users
         io.emit('chatMessage', messageData);
         
-        // Mark as delivered to other users
         setTimeout(() => {
             const otherUsers = Object.keys(users).filter(id => id !== socket.id);
             if (otherUsers.length > 0) {
@@ -405,7 +369,6 @@ io.on('connection', (socket) => {
         }, 500);
     });
 
-    // Tinglish auto-suggestions
     socket.on('getSuggestions', async (input) => {
         if (input.length < 2) {
             socket.emit('suggestions', []);
@@ -416,7 +379,6 @@ io.on('connection', (socket) => {
         socket.emit('suggestions', suggestions);
     });
 
-    // Typing indicators
     socket.on('typing', (isTyping) => {
         const username = users[socket.id]?.username;
         if (username) {
@@ -448,7 +410,6 @@ io.on('connection', (socket) => {
         }
     });
 
-    // Mark message as seen
     socket.on('messageSeen', async (messageId) => {
         try {
             const message = await Message.findOne({ id: messageId });
