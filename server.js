@@ -263,7 +263,7 @@ Return as JSON array of strings. Each should be a common Telugu-English phrase.`
     }
 }
 
-// Train AI from chat history
+// Train AI from chat history - FIXED VERSION WITHOUT BROKEN REGEX
 async function trainFromHistory() {
     try {
         const recentMessages = await Message.find({ 
@@ -271,26 +271,37 @@ async function trainFromHistory() {
         }).sort({ timestamp: -1 }).limit(50);
         
         for (const msg of recentMessages) {
-            // Extract original and corrected versions
-            if (msg.msg.includes('→') || msg.msg.includes('->')) {
-                const parts = msg.msg.split(/[→->]/);
-                if (parts.length === 2) {
-                    const original = parts[0].trim();
-                    const corrected = parts[1].trim();
-                    
-                    await TrainingData.findOneAndUpdate(
-                        { original: original.toLowerCase() },
-                        { 
-                            $set: { 
-                                original: original.toLowerCase(),
-                                corrected: corrected,
-                                timestamp: new Date()
-                            },
-                            $inc: { usageCount: 1 }
+            // Extract original and corrected versions - using simple string methods
+            let original = '';
+            let corrected = '';
+            
+            if (msg.msg.includes('→')) {
+                const parts = msg.msg.split('→');
+                original = parts[0].trim();
+                corrected = parts[1].trim();
+            } else if (msg.msg.includes('->')) {
+                const parts = msg.msg.split('->');
+                original = parts[0].trim();
+                corrected = parts[1].trim();
+            } else if (msg.msg.includes('=>')) {
+                const parts = msg.msg.split('=>');
+                original = parts[0].trim();
+                corrected = parts[1].trim();
+            }
+            
+            if (original && corrected) {
+                await TrainingData.findOneAndUpdate(
+                    { original: original.toLowerCase() },
+                    { 
+                        $set: { 
+                            original: original.toLowerCase(),
+                            corrected: corrected,
+                            timestamp: new Date()
                         },
-                        { upsert: true, new: true }
-                    );
-                }
+                        $inc: { usageCount: 1 }
+                    },
+                    { upsert: true, new: true }
+                );
             }
         }
         console.log('Training completed from chat history');
