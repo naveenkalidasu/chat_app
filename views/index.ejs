@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Chat - Tinglish</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .login-container {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .login-container h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 2rem;
+        }
+
+        .login-container p {
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .login-container form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .login-container input {
+            padding: 15px;
+            border: 2px solid #eee;
+            border-radius: 12px;
+            outline: none;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .login-container input:focus {
+            border-color: #667eea;
+        }
+
+        .login-container button {
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .login-container button:hover {
+            transform: scale(1.02);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .features-preview {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 12px;
+        }
+
+        .features-preview h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .features-preview ul {
+            list-style: none;
+            text-align: left;
+            color: #666;
+        }
+
+        .features-preview li {
+            padding: 5px 0;
+            font-size: 0.9rem;
+        }
+
+        .features-preview li::before {
+            content: "✨ ";
+        }
+
+        @media (max-width: 600px) {
+            .login-container {
+                padding: 30px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <h1>💬 AI Chat - Tinglish</h1>
+        <p>Chat in English or Telugu-English with AI grammar support</p>
+        
+        <form action="/chat" method="POST">
+            <input type="text" name="username" placeholder="Enter your username" required minlength="2" maxlength="20">
+            <button type="submit">Join Chat</button>
+        </form>
+        
+        <div class="features-preview">
+            <h3>✨ Features</h3>
+            <ul>
+                <li>Tinglish Auto-Suggestions</li>
+                <li>AI Grammar Correction</li>
+                <li>Live Typing Indicators</li>
+                <li>Custom Chat Themes</li>
+                <li>Message Status Tracking</li>
+                <li>AI Learns from Chats</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>
