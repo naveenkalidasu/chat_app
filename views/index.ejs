@@ -3,132 +3,99 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Chat - Tinglish</title>
+    <title>Group Chat · WhatsApp</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0b141a;
             height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
         }
-
         .login-container {
-            background: white;
+            background: #1f2c33;
             padding: 40px;
             border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
             width: 90%;
             max-width: 400px;
             text-align: center;
         }
-
         .login-container h1 {
-            color: #333;
-            margin-bottom: 10px;
+            color: #e9edef;
             font-size: 2rem;
+            margin-bottom: 8px;
         }
-
-        .login-container p {
-            color: #666;
+        .login-container .sub {
+            color: #8696a0;
             margin-bottom: 30px;
         }
-
         .login-container form {
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 15px;
         }
-
         .login-container input {
             padding: 15px;
-            border: 2px solid #eee;
+            border: 2px solid #2a3942;
             border-radius: 12px;
-            outline: none;
+            background: #111b21;
+            color: #e9edef;
             font-size: 1rem;
+            outline: none;
             transition: border-color 0.3s;
         }
-
         .login-container input:focus {
-            border-color: #667eea;
+            border-color: #00a884;
         }
-
+        .login-container input::placeholder {
+            color: #8696a0;
+        }
         .login-container button {
             padding: 15px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #00a884;
             color: white;
             border: none;
             border-radius: 12px;
             cursor: pointer;
             font-size: 1.1rem;
-            transition: transform 0.2s, box-shadow 0.2s;
+            font-weight: 600;
+            transition: transform 0.2s;
         }
-
         .login-container button:hover {
             transform: scale(1.02);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
         }
-
-        .features-preview {
+        .features {
             margin-top: 20px;
             padding: 15px;
-            background: #f8f9fa;
+            background: #111b21;
             border-radius: 12px;
-        }
-
-        .features-preview h3 {
-            color: #667eea;
-            margin-bottom: 10px;
-        }
-
-        .features-preview ul {
-            list-style: none;
             text-align: left;
-            color: #666;
+            color: #8696a0;
         }
-
-        .features-preview li {
-            padding: 5px 0;
-            font-size: 0.9rem;
-        }
-
-        .features-preview li::before {
-            content: "✨ ";
-        }
-
-        @media (max-width: 600px) {
-            .login-container {
-                padding: 30px 20px;
-            }
-        }
+        .features h3 { color: #00a884; margin-bottom: 10px; text-align: center; }
+        .features li { padding: 4px 0; list-style: none; }
+        .features li::before { content: "✅ "; }
     </style>
 </head>
 <body>
     <div class="login-container">
-        <h1>💬 AI Chat - Tinglish</h1>
-        <p>Chat in English or Telugu-English with AI grammar support</p>
-        
+        <h1>💬 Group Chat</h1>
+        <p class="sub">Join the conversation with everyone</p>
         <form action="/chat" method="POST">
             <input type="text" name="username" placeholder="Enter your username" required minlength="2" maxlength="20">
-            <button type="submit">Join Chat</button>
+            <button type="submit">Join Group Chat</button>
         </form>
-        
-        <div class="features-preview">
+        <div class="features">
             <h3>✨ Features</h3>
             <ul>
-                <li>Tinglish Auto-Suggestions</li>
-                <li>AI Grammar Correction</li>
-                <li>Live Typing Indicators</li>
-                <li>Custom Chat Themes</li>
-                <li>Message Status Tracking</li>
-                <li>AI Learns from Chats</li>
+                <li>Real-time group messaging</li>
+                <li>Live typing indicators</li>
+                <li>Message reactions ❤️</li>
+                <li>File sharing 📂</li>
+                <li>Online users list</li>
             </ul>
         </div>
     </div>
